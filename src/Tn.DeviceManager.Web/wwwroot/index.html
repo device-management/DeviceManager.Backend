@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.2.0.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.min.js"></script>
+    <script src="/signalr/hubs"></script>
+</head>
+<body>
+
+    <script type="text/javascript">
+
+        var hub = $.connection.deviceManagerHub;
+
+        hub.client.deviceUpdated = console.log;
+        hub.client.deviceRegistered = console.log;
+        hub.client.measurementOccured = console.log;
+
+        $.connection.hub.logging = true;
+        $.connection.hub.start();
+    </script>
+</body>
+</html>

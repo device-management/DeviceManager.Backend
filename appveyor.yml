@@ -1,0 +1,16 @@
+configuration: Release
+
+version: 1.0.{build}
+
+image: Visual Studio 2017 RC
+
+before_build:
+- nuget sources add -Name aspnetcore-dev -Source https://dotnet.myget.org/F/aspnetcore-dev
+- dotnet restore
+
+build_script:
+- dotnet build
+
+test_script:
+- cd test\Tn.DeviceManager.Core.Tests
+- dotnet test

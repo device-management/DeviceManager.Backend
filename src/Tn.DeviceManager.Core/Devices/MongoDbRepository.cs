@@ -21,14 +21,14 @@ namespace Tn.DeviceManager.Devices
 
         private readonly JsonWriterSettings jsonWriterSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
 
-        public MongoDbRepository(IMongoCollection<BsonDocument> collection,IObjectSerializer serializer, MongoDbSettings settings)
+        public MongoDbRepository(IMongoCollection<BsonDocument> collection, IObjectSerializer serializer, MongoDbSettings settings)
         {
             _collection = collection ?? throw new ArgumentNullException(nameof(collection));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
-        public async Task<ICollection<DeviceDescriptor>> Filter(FilterDescriptor filterDescriptor)
+        public async Task<FilterResult> Filter(FilterDescriptor filterDescriptor)
         {
             FilterDefinitionBuilder<BsonDocument> filterBuilder = Builders<BsonDocument>.Filter;
 
@@ -68,7 +68,10 @@ namespace Tn.DeviceManager.Devices
             try
             {
                 List<BsonDocument> result = await findFluent.ToListAsync();
-                return result.Select(item => (DeviceDescriptor)_serializer.DeserializeObject(item.ToJson(jsonWriterSettings), typeof(DeviceDescriptor))).ToArray();
+                long total = await findFluent.CountAsync();
+                return new FilterResult(
+                    result.Select(item => (DeviceDescriptor)_serializer.DeserializeObject(item.ToJson(jsonWriterSettings), typeof(DeviceDescriptor))).ToArray(),
+                    total);
             }
             catch (Exception ex)
             {
@@ -76,34 +79,26 @@ namespace Tn.DeviceManager.Devices
             }
         }
 
-        public async Task Insert(DeviceDescriptor deviceDescriptor)
+        public async Task InsertOrUpdate(DeviceDescriptor deviceDescriptor)
         {
-            try
-            {
-                string json = _serializer.SerializeObject(deviceDescriptor);
-                await _collection.InsertOneAsync(BsonSerializer.Deserialize<BsonDocument>(json));
-            }
-            catch (Exception ex)
-            {
-                throw new DeviceRepositoryException("Cannot insert device into database.", ex);
-            }
-        }
-
-        public async Task Update(DeviceDescriptor deviceDescriptor)
-        {
-            var filter = Builders<BsonDocument>.Filter.Eq(ToCamlCase(nameof(deviceDescriptor.DeviceId)), deviceDescriptor.DeviceId);
+            var filter = Builders<BsonDocument>.Filter.Eq(ToCamelCase(nameof(deviceDescriptor.DeviceId)), deviceDescriptor.DeviceId);
 
             try
             {
-                string propertiesAsJson = _serializer.SerializeObject(deviceDescriptor.Properties);
-                BsonDocument propertiesAsBson = BsonSerializer.Deserialize<BsonDocument>(propertiesAsJson);
-                var update = Builders<BsonDocument>.Update.Set(ToCamlCase(nameof(deviceDescriptor.Properties)), propertiesAsBson);
-                UpdateResult result = await _collection.UpdateOneAsync(filter, update);
+
+                var update = Builders<BsonDocument>.Update.Combine(deviceDescriptor.Properties.Select(entry =>
+                Builders<BsonDocument>.Update.Set(ToDotNotation(nameof(deviceDescriptor.Properties), entry.Key), entry.Value)).ToArray());
+                UpdateResult result = await _collection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
             }
             catch (Exception ex)
             {
                 throw new DeviceRepositoryException("Cannot update device in database.", ex);
             }
+        }
+
+        private string ToDotNotation(string key, string value)
+        {
+            return $"{ToCamelCase(key)}.{ToCamelCase(value)}";
         }
 
         private static FilterDefinition<BsonDocument> ParseFilter(FilterItem filter)
@@ -112,7 +107,7 @@ namespace Tn.DeviceManager.Devices
                                 : Builders<BsonDocument>.Filter.Regex(filter.Key, filter.Value);
         }
 
-        private static string ToCamlCase(string str)
+        private static string ToCamelCase(string str)
         {
             return Char.ToLowerInvariant(str[0]) + str.Substring(1);
         }

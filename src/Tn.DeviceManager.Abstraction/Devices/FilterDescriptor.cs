@@ -6,24 +6,9 @@ namespace Tn.DeviceManager.Devices
 
     public class FilterDescriptor
     {
-        public FilterDescriptor(ICollection<FilterItem> filters, FilteringLogic logic = FilteringLogic.All, int? limit = null, int? offset = null)
-        {
-            Filters = filters ?? Array.Empty<FilterItem>();
-            Logic = logic;
-            Limit = limit;
-            Offset = offset;
-        }
+        public ICollection<FilterItem> Filters { get; set; }
 
-        public FilterDescriptor(int? limit = null, int? offset = null)
-        {
-            Filters = Array.Empty<FilterItem>();
-            Limit = limit;
-            Offset = offset;
-        }
-
-        public ICollection<FilterItem> Filters { get; }
-
-        public FilteringLogic Logic { get; }
+        public FilteringLogic Logic { get; set; }
 
         public int? Limit { get; set; }
 

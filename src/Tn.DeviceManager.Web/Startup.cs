@@ -3,6 +3,7 @@
 namespace Tn.DeviceManager
 {
     using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Cors.Infrastructure;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -33,14 +34,26 @@ namespace Tn.DeviceManager
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", builder =>
+                {
+                    builder.AllowAnyOrigin();
+                    builder.AllowAnyMethod();
+                    builder.AllowAnyHeader();
+                    builder.AllowCredentials();
+                });
+            });
+
             services.AddOptions();
             services.Configure<MongoDbSettings>(Configuration.GetSection("mongodb"));
             services.Configure<InfluxDbSettings>(Configuration.GetSection("influxdb"));
             services.Configure<MqttServiceSettings>(Configuration.GetSection("mqtt"));
 
-            var serializerSettings = new JsonSerializerSettings();
-            serializerSettings.ContractResolver = new SignalRContractResolver();
-
+            var serializerSettings = new JsonSerializerSettings()
+            {
+                ContractResolver = new SignalRContractResolver()
+            };
             var serializer = JsonSerializer.Create(serializerSettings);
 
             services.Add(new ServiceDescriptor(typeof(JsonSerializer),
@@ -69,6 +82,7 @@ namespace Tn.DeviceManager
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("AllowAllOrigins");
             app.UseStaticFiles();
             app.UseDefaultFiles();
             app.UseHttpException();
@@ -86,7 +100,7 @@ namespace Tn.DeviceManager
             {
                 await Task.WhenAll(app.ApplicationServices.GetServices<ILifecycle>().Select(lifecycle => lifecycle.Start()));
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 lifetime.StopApplication();
             }

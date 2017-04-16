@@ -42,13 +42,13 @@ namespace Tn.DeviceManager.Test
         public async Task Query_RequestSent_ProperRequestGenerated()
         {
             // Arange
-            var filter1 = new QueryDescriptor("filter1");
+            var filter1 = new QueryDescriptor("filter1", order: OrderType.Ascending, limit: 1);
             var filter2 = new QueryDescriptor("filter2", DateTime.Now);
 
             var expectedQuery = new StringBuilder()
                         .Append($"?db={this._dbSettings.DatabaseName}")
                         .Append("&q=")
-                        .Append(WebUtility.UrlEncode($"SELECT * FROM \"{filter1.Name}\";"))
+                        .Append(WebUtility.UrlEncode($"SELECT * FROM \"{filter1.Name}\" ORDER BY time ASC LIMIT 1;"))
                         .Append(WebUtility.UrlEncode($"SELECT * FROM \"{filter2.Name}\" WHERE time > {filter2.DateFrom.Value.ToUnixNanoseconds()}"))
                         .ToString();
 
@@ -167,7 +167,10 @@ namespace Tn.DeviceManager.Test
         {
             _requestHandler = requestHandler ?? throw new ArgumentNullException(nameof(requestHandler));
         }
+
+        #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+        #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             return _requestHandler(request);
         }

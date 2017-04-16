@@ -33,7 +33,7 @@ namespace Tn.DeviceManager
         {
             _subscriptions.Enqueue(_messageBus.Observe<MeasurementEvent>().Subscribe(async(@event) => await HandleMeasurementEvent(@event)));
             _subscriptions.Enqueue(_messageBus.Observe<RegisterEvent>().Subscribe(async(@event) => await HandleRegisterEvent(@event)));
-            _subscriptions.Enqueue(_messageBus.Observe<StateChangedEvent>().Subscribe(async(@event) => await HandleStateChangedEvent(@event)));
+            _subscriptions.Enqueue(_messageBus.Observe<PropertiesChangedEvent>().Subscribe(async(@event) => await HandleProperiesChangedEvent(@event)));
 
             return Task.FromResult(0);
         }
@@ -51,21 +51,24 @@ namespace Tn.DeviceManager
         private async Task HandleMeasurementEvent(MeasurementEvent measurementEvent)
         {
             await _measurementsRepository.Write(new WriteRequest(measurementEvent.DeviceId, measurementEvent.Points));
-            _hubContext.Clients.All.MeasurementOccured(measurementEvent);
+            var channelEvent = new ChannelEvent(measurementEvent.DeviceId, Events.MeasurementOccured, measurementEvent);
+            _hubContext.Clients.Group(measurementEvent.DeviceId).EventArrived(channelEvent);
         }
 
         private async Task HandleRegisterEvent(RegisterEvent registerEvent)
         {
             var device = new DeviceDescriptor(registerEvent.DeviceId, registerEvent.Properties);
-            await _deviceRepository.Insert(device);
-            _hubContext.Clients.All.DeviceRegistered(device);
+            await _deviceRepository.InsertOrUpdate(device);
+            var channelEvent = new ChannelEvent(registerEvent.DeviceId, Events.DeviceRegistered, registerEvent);
+            _hubContext.Clients.Group(device.DeviceId).EventArrived(channelEvent);
         }
 
-        private async Task HandleStateChangedEvent(StateChangedEvent registerEvent)
+        private async Task HandleProperiesChangedEvent(PropertiesChangedEvent propertiesChangedEvent)
         {
-            var device = new DeviceDescriptor(registerEvent.DeviceId, registerEvent.State);
-            await _deviceRepository.Update(device);
-            _hubContext.Clients.All.DeviceUpdated(device);
+            var device = new DeviceDescriptor(propertiesChangedEvent.DeviceId, propertiesChangedEvent.Properties);
+            await _deviceRepository.InsertOrUpdate(device);
+            var channelEvent = new ChannelEvent(propertiesChangedEvent.DeviceId, Events.DeviceUpdated, propertiesChangedEvent);
+            _hubContext.Clients.Group(device.DeviceId).EventArrived(channelEvent);
         }
     }
 }

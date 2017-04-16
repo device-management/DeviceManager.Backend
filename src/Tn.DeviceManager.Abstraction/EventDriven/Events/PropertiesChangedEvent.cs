@@ -3,19 +3,19 @@
     using System;
     using System.Collections.Generic;
 
-    public class StateChangedEvent
+    public class PropertiesChangedEvent
     {
-        public StateChangedEvent(string deviceId, IReadOnlyDictionary<string, object> state)
+        public PropertiesChangedEvent(string deviceId, IReadOnlyDictionary<string, object> properties)
         {
             if (string.IsNullOrEmpty(deviceId))
                 throw new ArgumentNullException(nameof(deviceId));
 
             DeviceId = deviceId;
-            State = state ?? Dictionary.EmptyReadOnly();
+            Properties = properties ?? Dictionary.EmptyReadOnly();
         }
 
         public string DeviceId { get; }
 
-        public IReadOnlyDictionary<string, object> State { get; }
+        public IReadOnlyDictionary<string, object> Properties { get; }
     }
 }

@@ -29,9 +29,9 @@ namespace Tn.DeviceManager.Controllers
         }
 
         [HttpGet]
-        public async Task<ICollection<DeviceDescriptor>> Get(int? limit = null, int? offset = null)
+        public async Task<FilterResult> Get(int? limit = null, int? offset = null)
         {
-            var filter = new FilterDescriptor(limit, offset);
+            var filter = new FilterDescriptor();// new FilterDescriptor(limit, offset);
 
             try
             {
@@ -50,12 +50,13 @@ namespace Tn.DeviceManager.Controllers
         [HttpGet("{deviceId}")]
         public async Task<DeviceDescriptor> Get(string deviceId)
         {
-            var filter = new FilterDescriptor(new[] { new FilterItem(FilterConstants.DeviceId, deviceId) });
+            //var filter = new FilterDescriptor(new[] { new FilterItem(FilterConstants.DeviceId, deviceId) });
+            var filter = new FilterDescriptor();
 
             try
             {
-                ICollection<DeviceDescriptor> devices = await _deviceRepository.Filter(filter);
-                DeviceDescriptor device = devices.FirstOrDefault();
+                FilterResult devices = await _deviceRepository.Filter(filter);
+                DeviceDescriptor device = devices.Devices.FirstOrDefault();
                 if (device == null)
                 {
                     throw new HttpException(HttpStatusCode.NotFound, $"Device identifier {deviceId} not found.");
@@ -73,8 +74,8 @@ namespace Tn.DeviceManager.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ICollection<DeviceDescriptor>> Find([FromBody]FilterDescriptor filter)
+        [HttpPost("find")]
+        public async Task<FilterResult> Find([FromBody]FilterDescriptor filter)
         {
             try
             {

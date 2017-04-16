@@ -35,7 +35,7 @@ namespace Tn.DeviceManager.Measurements
                 throw new ArgumentNullException(nameof(queries));
             }
 
-            if(queries.Count == 0)
+            if (queries.Count == 0)
             {
                 throw new ArgumentException("The queries collection is empty.");
             }
@@ -56,7 +56,7 @@ namespace Tn.DeviceManager.Measurements
             HttpRequestMessage request = PrepareRequest(HttpMethod.Get, uriBuilder.Uri);
 
             _logger.LogDebug("Query HTTP request | Method: {0}, Uri: {1}", request.Method, request.RequestUri);
-            
+
             try
             {
                 HttpResponseMessage response = await this._httpClient.SendAsync(request);
@@ -89,7 +89,7 @@ namespace Tn.DeviceManager.Measurements
             };
 
             HttpRequestMessage request = PrepareRequest(HttpMethod.Post, uriBuilder.Uri);
-            
+
             try
             {
                 string serializedRequest = SerializeWriteRequest(writeRequest);
@@ -131,7 +131,7 @@ namespace Tn.DeviceManager.Measurements
 
                 await response.EnsureSuccessStatusCodeAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new MeasurementsRepositoryException("Cannot create database.", ex);
             }
@@ -180,6 +180,16 @@ namespace Tn.DeviceManager.Measurements
                 if (sqlQuery.Count > 0)
                 {
                     queryBuilder.Append($" WHERE {string.Join(" AND ", sqlQuery)}");
+                }
+
+                if (query.Order.HasValue)
+                {
+                    queryBuilder.Append($" ORDER BY time {(query.Order.Value == OrderType.Ascending ? "ASC" : "DESC")}");
+                }
+
+                if (query.Limit.HasValue)
+                {
+                    queryBuilder.Append($" LIMIT {query.Limit}");
                 }
 
                 queriesBuilder.Add(queryBuilder.ToString());
@@ -241,7 +251,7 @@ namespace Tn.DeviceManager.Measurements
         {
             List<QueryResult> results = new List<QueryResult>();
             var jResults = JObject.Parse(json);
-            foreach(JToken jResult in jResults["results"].ToArray())
+            foreach (JToken jResult in jResults["results"].ToArray())
             {
                 JToken jValues = jResult.SelectToken("series[0].values");
                 if (jValues == null)

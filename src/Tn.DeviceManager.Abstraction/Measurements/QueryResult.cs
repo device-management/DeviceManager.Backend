@@ -15,7 +15,7 @@ namespace Tn.DeviceManager.Measurements
             Points = points ?? Array.Empty<Point>();
         }
 
-        public string Name { get; set; }
-        public ICollection<Point> Points { get; set; }
+        public string Name { get; }
+        public ICollection<Point> Points { get; }
     }
 }

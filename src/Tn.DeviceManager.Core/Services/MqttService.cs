@@ -100,7 +100,7 @@ namespace Tn.DeviceManager.Services
             Type messageType;
             if(_topicMatcher.MatchState(e.Topic))
             {
-                messageType = typeof(StateChangedEvent);
+                messageType = typeof(PropertiesChangedEvent);
             }
             else if(_topicMatcher.MatchMeasurment(e.Topic))
             {

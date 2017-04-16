@@ -5,17 +5,17 @@
 
     public class CommandEvent
     {
-        public CommandEvent(string deviceId, IReadOnlyDictionary<string, object> fields)
+        public CommandEvent(string deviceId, IReadOnlyDictionary<string, object> properties)
         {
             if (string.IsNullOrEmpty(deviceId))
                 throw new ArgumentNullException(nameof(deviceId));
 
             DeviceId = deviceId;
-            Fields = fields ?? Dictionary.EmptyReadOnly();
+            Properties = properties ?? Dictionary.EmptyReadOnly();
         }
 
         public string DeviceId { get; }
 
-        public IReadOnlyDictionary<string, object> Fields { get; }
+        public IReadOnlyDictionary<string, object> Properties { get; }
     }
 }

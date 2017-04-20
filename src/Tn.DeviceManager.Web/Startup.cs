@@ -3,7 +3,6 @@
 namespace Tn.DeviceManager
 {
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Cors.Infrastructure;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -83,8 +82,6 @@ namespace Tn.DeviceManager
             }
 
             app.UseCors("AllowAllOrigins");
-            app.UseStaticFiles();
-            app.UseDefaultFiles();
             app.UseHttpException();
             app.UseWebSockets();
             app.UseSignalR();

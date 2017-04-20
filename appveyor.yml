@@ -2,15 +2,22 @@ configuration: Release
 
 version: 1.0.{build}
 
-image: Visual Studio 2017 RC
+image: Visual Studio 2017
 
 before_build:
-- nuget sources add -Name aspnetcore-dev -Source https://dotnet.myget.org/F/aspnetcore-dev
+- nuget sources add -Name aspnetcore-master -Source https://dotnet.myget.org/F/aspnetcore-master/
 - dotnet restore
 
 build_script:
-- dotnet build
+- dotnet build -c Release
 
 test_script:
-- cd test\Tn.DeviceManager.Core.Tests
-- dotnet test
+- dotnet test test\Tn.DeviceManager.Core.Tests\Tn.DeviceManager.Core.Test.csproj -c Release
+
+before_deploy:
+- docker login -u="%DOCKER_USERNAME%" -p="%DOCKER_PASSWORD%"
+
+deploy_script:
+- dotnet publish src\Tn.DeviceManager.Web\Tn.DeviceManager.Web.csproj -o ..\..\dist -c Release
+- docker build -t devicemanagment/dm-backend .
+- docker push devicemanagment/dm-backend

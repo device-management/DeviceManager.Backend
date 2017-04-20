@@ -1,5 +1,5 @@
 # DeviceManager.Backend
 
-AppVeyor: [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/nocotom/DeviceManager.Backend?branch=develop&svg=true)](https://ci.appveyor.com/project/nocotom/devicemanager-backend)
+Build: [![Travis](https://travis-ci.org/device-management/dm-backend.svg?branch=develop)](https://travis-ci.org/device-management/dm-backend)
 
-A backend for the DeviceManager.
+Docker: [![Docker Pulls](https://img.shields.io/docker/pulls/devicemanagment/dm-backend.svg)](https://hub.docker.com/r/devicemanagment/dm-backend/)

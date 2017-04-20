@@ -1,0 +1,28 @@
+#.travis.yml
+sudo: required
+
+language: csharp
+mono: none
+dotnet: 1.0.1
+dist: trusty
+
+services:
+  - docker
+
+branches:
+  only:
+    - develop
+    - master
+
+before_script:
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - dotnet restore -s https://dotnet.myget.org/F/aspnetcore-master/ -s https://api.nuget.org/v3/index.json
+
+script:
+  - dotnet build -c Release
+  - dotnet test test/Tn.DeviceManager.Core.Tests/Tn.DeviceManager.Core.Test.csproj -c Release
+
+after_success:
+  - dotnet publish src/Tn.DeviceManager.Web/Tn.DeviceManager.Web.csproj -o ../../dist -c Release
+  - docker build -t devicemanagment/dm-backend .
+  - docker push devicemanagment/dm-backend

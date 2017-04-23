@@ -12,6 +12,7 @@ namespace Tn.DeviceManager
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
+                .CaptureStartupErrors(true)
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .UseApplicationInsights()

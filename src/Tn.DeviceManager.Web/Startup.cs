@@ -99,25 +99,12 @@ namespace Tn.DeviceManager
 
         private async Task StartServices(IApplicationBuilder app, IApplicationLifetime lifetime)
         {
-            try
-            {
-                await Task.WhenAll(app.ApplicationServices.GetServices<ILifecycle>().Select(lifecycle => lifecycle.Start()));
-            }
-            catch(Exception)
-            {
-                lifetime.StopApplication();
-            }
+            await Task.WhenAll(app.ApplicationServices.GetServices<ILifecycle>().Select(lifecycle => lifecycle.Start()));
         }
 
         private async Task StopServices(IApplicationBuilder app)
         {
-            try
-            {
-                await Task.WhenAll(app.ApplicationServices.GetServices<ILifecycle>().Select(lifecycle => lifecycle.Stop()));
-            }
-            catch(Exception)
-            {
-            }
+            await Task.WhenAll(app.ApplicationServices.GetServices<ILifecycle>().Select(lifecycle => lifecycle.Stop()));
         }
     }
 }

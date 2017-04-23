@@ -4,6 +4,7 @@ namespace Tn.DeviceManager
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.HttpOverrides;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -81,6 +82,11 @@ namespace Tn.DeviceManager
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             app.UseCors("AllowAllOrigins");
             app.UseHttpException();
             app.UseWebSockets();
@@ -88,7 +94,7 @@ namespace Tn.DeviceManager
             app.UseMvc();
 
             lifetime.ApplicationStarted.Register(async() => await StartServices(app, lifetime));
-            lifetime.ApplicationStopped.Register(async() => await StopServices(app));
+            lifetime.ApplicationStopping.Register(async() => await StopServices(app));
         }
 
         private async Task StartServices(IApplicationBuilder app, IApplicationLifetime lifetime)
@@ -105,7 +111,13 @@ namespace Tn.DeviceManager
 
         private async Task StopServices(IApplicationBuilder app)
         {
-            await Task.WhenAll(app.ApplicationServices.GetServices<ILifecycle>().Select(lifecycle => lifecycle.Stop()));
+            try
+            {
+                await Task.WhenAll(app.ApplicationServices.GetServices<ILifecycle>().Select(lifecycle => lifecycle.Stop()));
+            }
+            catch(Exception)
+            {
+            }
         }
     }
 }

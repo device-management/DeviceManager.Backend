@@ -3,11 +3,13 @@ package com.nocotom.dm.configuration;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
+@Component
 @ConfigurationProperties("mongo-db")
-public class MongoDbConfiguration {
+public class MongoDbProperties {
 
     private static final int DEFAULT_MONGO_DB_PORT = 27017;
 

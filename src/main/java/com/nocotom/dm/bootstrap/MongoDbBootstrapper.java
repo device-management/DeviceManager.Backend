@@ -5,6 +5,7 @@ import com.mongodb.async.client.MongoClients;
 import com.mongodb.async.client.MongoCollection;
 import com.mongodb.async.client.MongoDatabase;
 import com.nocotom.dm.configuration.MongoDbProperties;
+import org.bson.BsonDocument;
 import org.bson.RawBsonDocument;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -16,7 +17,7 @@ import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SING
 @Configuration
 @ComponentScan(basePackages = {"com.nocotom.dm.configuration"})
 public class MongoDbBootstrapper {
-
+/*
     @Bean
     @Scope(SCOPE_SINGLETON)
     public MongoDatabase bootstrapDatabase(final MongoDbProperties configuration) {
@@ -26,8 +27,8 @@ public class MongoDbBootstrapper {
     }
 
     @Bean
-    public MongoCollection<RawBsonDocument> bootstrapCollection(final MongoDbProperties configuration,
-                                                                final MongoDatabase database) {
-        return database.getCollection(configuration.getCollectionName(), RawBsonDocument.class);
-    }
+    public MongoCollection<BsonDocument> bootstrapCollection(final MongoDbProperties configuration,
+                                                             final MongoDatabase database) {
+        return database.getCollection(configuration.getCollectionName(), BsonDocument.class);
+    }*/
 }

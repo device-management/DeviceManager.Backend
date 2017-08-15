@@ -4,8 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 
-//import javax.validation.constraints.NotNull;
-//import javax.validation.constraints.Size;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import java.util.Map;
 
@@ -13,11 +13,11 @@ import java.util.Map;
 @EqualsAndHashCode
 public class Device {
 
-    //@NotNull
-    //@Size(min=2, max=30)
+    @NotNull
+    @Size(min=2, max=30)
     @Id
     private String deviceId;
 
-    //@NotNull
+    @NotNull
     private Map<String, Object> properties;
 }

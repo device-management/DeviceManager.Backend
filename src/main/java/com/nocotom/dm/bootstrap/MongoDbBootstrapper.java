@@ -19,7 +19,6 @@ import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_SING
 public class MongoDbBootstrapper {
 /*
     @Bean
-    @Scope(SCOPE_SINGLETON)
     public MongoDatabase bootstrapDatabase(final MongoDbProperties configuration) {
         String uri = String.format("mongodb://%s:%s", configuration.getHost(), configuration.getPort());
         MongoClient mongoClient = MongoClients.create(uri);

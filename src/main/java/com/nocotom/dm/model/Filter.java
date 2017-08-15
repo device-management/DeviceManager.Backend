@@ -3,23 +3,21 @@ package com.nocotom.dm.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-//import javax.validation.constraints.Min;
-//import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Min;
 import java.util.Collection;
+import java.util.Collections;
 
 @Data
 @EqualsAndHashCode
 public class Filter {
 
-    //@NotNull
-    private Collection<FilterItem> filters;
+    private Collection<FilterItem> filters = Collections.emptyList();
 
-    //@NotNull
-    private FilteringLogic logic;
+    private FilteringLogic logic = FilteringLogic.ALL;
 
-    //@Min(value = 0)
+    @Min(value = 0)
     private Integer limit;
 
-    //@Min(value = 0)
+    @Min(value = 0)
     private Integer offset;
 }

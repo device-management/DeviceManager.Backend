@@ -9,30 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import reactor.core.publisher.Flux;
 
-import javax.swing.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.util.*;
 
 @SpringBootApplication
-public class DeviceManagementApplication implements CommandLineRunner {
-
-	@Autowired
-	private DeviceRepository deviceRepository;
+public class DeviceManagementApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DeviceManagementApplication.class, args);
 	}
-
-	@Override
+/*
 	public void run(String... args) throws Exception {
 		Device device = new Device();
 		device.setDeviceId("testId");
@@ -53,5 +42,5 @@ public class DeviceManagementApplication implements CommandLineRunner {
 		Flux<Device> devices = deviceRepository.filter(filter);
 		List<Device> collection = devices.collectList().block();
 	}
-
+*/
 }

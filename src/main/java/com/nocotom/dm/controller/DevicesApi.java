@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.util.Map;
 
 @RequestMapping(path = "api/devices", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public interface DevicesApi {
@@ -23,7 +22,4 @@ public interface DevicesApi {
     @PostMapping(value = "/find", consumes = MediaType.ALL_VALUE)
     Mono<FilterResult> find(@Valid @RequestBody Filter filter);
 
-    @PostMapping(value = "/{deviceId}/command", consumes = MediaType.ALL_VALUE)
-    void command(@PathVariable String deviceId,
-                 @RequestBody Map<String, Object> properties);
 }

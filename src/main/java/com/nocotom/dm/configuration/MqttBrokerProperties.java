@@ -5,17 +5,29 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Getter
 @Setter
 @Component
 @ConfigurationProperties("mqtt-broker")
 public class MqttBrokerProperties {
 
-    private static final int DEFAULT_MQTT_BROKER_PORT = 1883;
+    private static final String DEFAULT_MQTT_URI = "tcp://localhost:1883";
 
-    private static final String DEFAULT_MQTT_BROKER_HOST = "localhost";
+    public final static String COMMAND_TOPIC_PATTERN = "devices/{0}/command";
 
-    private String host = DEFAULT_MQTT_BROKER_HOST;
+    public final static String MEASUREMENT_TOPIC = "devices/+/measurement";
 
-    private int port = DEFAULT_MQTT_BROKER_PORT;
+    public final static String REGISTER_TOPIC = "devices/+/register";
+
+    public final static String STATE_TOPIC = "devices/+/state";
+
+    public final static String DEFAULT_USER_NAME = "dm-backend";
+
+    private String uri =  DEFAULT_MQTT_URI;
+
+    private String[] subscribeTopics = new String[] { MEASUREMENT_TOPIC, REGISTER_TOPIC, STATE_TOPIC };
+
+    private String userName = DEFAULT_USER_NAME;
 }

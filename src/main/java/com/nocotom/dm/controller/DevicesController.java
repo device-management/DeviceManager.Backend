@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.util.Map;
+
 
 @RestController
 public class DevicesController implements DevicesApi {
@@ -29,12 +29,6 @@ public class DevicesController implements DevicesApi {
     @Override
     public Mono<FilterResult> find(@Valid @RequestBody Filter filter) {
         return Mono.empty();
-    }
-
-    @Override
-    public void command(@PathVariable String deviceId,
-                        @RequestBody Map<String, Object> properties){
-        int asd = 4;
     }
 
 

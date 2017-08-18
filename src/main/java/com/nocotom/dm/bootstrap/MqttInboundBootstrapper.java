@@ -1,6 +1,7 @@
 package com.nocotom.dm.bootstrap;
 
 import com.nocotom.dm.configuration.MqttBrokerProperties;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -12,7 +13,13 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
 @Configuration
-public class MqttClientBootstrapper {
+public class MqttInboundBootstrapper {
+
+    private final MqttBrokerProperties brokerProperties;
+
+    public MqttInboundBootstrapper(MqttBrokerProperties brokerProperties) {
+        this.brokerProperties = brokerProperties;
+    }
 
     @Bean
     public MessageChannel mqttInputChannel() {
@@ -20,9 +27,10 @@ public class MqttClientBootstrapper {
     }
 
     @Bean
-    public MessageProducer inbound(MqttBrokerProperties properties) {
+    public MessageProducer inbound() {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(properties.getUri(), properties.getUserName(), properties.getSubscribeTopics());
+                new MqttPahoMessageDrivenChannelAdapter(brokerProperties.getUri(), brokerProperties.getUserName(),
+                        brokerProperties.getSubscribeTopics());
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
@@ -32,7 +40,13 @@ public class MqttClientBootstrapper {
 
     @Bean
     @ServiceActivator(inputChannel = "mqttInputChannel")
-    public MessageHandler handler() {
-        return message -> System.out.println(message.getPayload());
+    public MessageHandler handler(ConfigurableApplicationContext context) {
+        return message -> {
+            MqttOutboundBootstrapper.MyGateway gateway = context.getBean(MqttOutboundBootstrapper.MyGateway.class);
+            System.out.println(message.getPayload());
+            gateway.sendToMqtt("Hello client!");
+        };
     }
+
+
 }

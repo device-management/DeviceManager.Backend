@@ -1,3 +1,11 @@
 mqtt-broker:
   host: localhost
   port: 1883
+
+
+spring:
+  influxdb:
+    url: http://localhost:8086
+    username: user
+    database: test
+    retention-policy: autogen

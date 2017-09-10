@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+
+<div id="content"></div>
+<input id="send-button" type="button" value="Send">
+<input id="send-button-2" type="button" value="Send 2">
+
+<script src="./node_modules/sockjs-client/dist/sockjs.min.js"></script>
+<script src="./node_modules/stompjs/lib/stomp.min.js"></script>
+
+<script>
+        var content = document.getElementById("content");
+        var button = document.getElementById("send-button");
+        var button2 = document.getElementById("send-button-2");
+
+        var stompClient = null;
+             
+        function addMessage(message) {
+            var node = document.createElement("p"); 
+            var textnode = document.createTextNode(message);
+            node.appendChild(textnode);
+            content.appendChild(node);
+        }
+            
+
+        //var socket = new SockJS("http://localhost:8080/channels");
+        var socket = new SockJS("/channels");
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function(frame) {
+            addMessage('Connected: ' + frame);
+            stompClient.subscribe('/devices/{.+}/register', function(messageOutput) {
+                addMessage(messageOutput.body);
+            });
+        });
+
+        button.addEventListener("click", function(){
+            sendMessage();
+        });
+        
+            /*
+        function disconnect() {
+            if(stompClient != null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }*/
+            
+        function sendMessage() {
+            var channelEvent = {
+                eventType: "eventType",
+                asd: true
+            };
+            stompClient.send("/devices/devId/command", {}, JSON.stringify(channelEvent));
+        }
+    
+
+  </script>
+</body>
+</html>

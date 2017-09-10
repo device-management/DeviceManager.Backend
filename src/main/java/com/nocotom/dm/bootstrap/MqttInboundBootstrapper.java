@@ -20,7 +20,7 @@ public class MqttInboundBootstrapper {
     public MqttInboundBootstrapper(MqttBrokerProperties brokerProperties) {
         this.brokerProperties = brokerProperties;
     }
-
+/*
     @Bean
     public MessageChannel mqttInputChannel() {
         return new DirectChannel();
@@ -42,11 +42,11 @@ public class MqttInboundBootstrapper {
     @ServiceActivator(inputChannel = "mqttInputChannel")
     public MessageHandler handler(ConfigurableApplicationContext context) {
         return message -> {
-            MqttOutboundBootstrapper.MyGateway gateway = context.getBean(MqttOutboundBootstrapper.MyGateway.class);
+            MqttBootstrapper.MyGateway gateway = context.getBean(MqttBootstrapper.MyGateway.class);
             System.out.println(message.getPayload());
             gateway.sendToMqtt("Hello client!");
         };
     }
 
-
+*/
 }

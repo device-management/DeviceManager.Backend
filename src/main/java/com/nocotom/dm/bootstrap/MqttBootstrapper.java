@@ -13,10 +13,10 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
 @Configuration
-public class MqttOutboundBootstrapper {
+public class MqttBootstrapper {
     private final MqttBrokerProperties brokerProperties;
 
-    public MqttOutboundBootstrapper(MqttBrokerProperties brokerProperties) {
+    public MqttBootstrapper(MqttBrokerProperties brokerProperties) {
         this.brokerProperties = brokerProperties;
     }
 
@@ -28,7 +28,7 @@ public class MqttOutboundBootstrapper {
         factory.setUserName(brokerProperties.getUserName());
         return factory;
     }
-
+/*
     @Bean
     @ServiceActivator(inputChannel = "mqttOutboundChannel")
     public MessageHandler mqttOutbound() {
@@ -49,5 +49,5 @@ public class MqttOutboundBootstrapper {
 
         void sendToMqtt(String data);
 
-    }
+    }*/
 }

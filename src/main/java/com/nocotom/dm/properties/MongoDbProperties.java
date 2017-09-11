@@ -1,4 +1,4 @@
-package com.nocotom.dm.configuration;
+package com.nocotom.dm.properties;
 
 import lombok.Getter;
 import lombok.Setter;

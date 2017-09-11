@@ -2,6 +2,7 @@ package com.nocotom.dm.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode
+@ToString
 public class Device {
 
     @NotNull

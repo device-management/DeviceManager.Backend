@@ -2,6 +2,7 @@ package com.nocotom.dm.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.validation.constraints.Min;
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.Collections;
 
 @Data
 @EqualsAndHashCode
+@ToString
 public class Filter {
 
     private Collection<FilterItem> filters = Collections.emptyList();

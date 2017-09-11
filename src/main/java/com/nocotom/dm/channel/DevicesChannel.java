@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Controller
 public class DevicesChannel {
-
+/*
     private final SimpMessagingTemplate messagingTemplate;
 
     public DevicesChannel(SimpMessagingTemplate messagingTemplate) {
@@ -30,5 +30,5 @@ public class DevicesChannel {
 
     public void registered(String deviceId, Map<String, Object> properties){
         messagingTemplate.convertAndSend(String.format("/devices/%s/register", deviceId), properties);
-    }
+    }*/
 }

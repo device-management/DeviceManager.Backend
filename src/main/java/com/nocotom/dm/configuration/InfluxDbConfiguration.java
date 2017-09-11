@@ -1,4 +1,4 @@
-package com.nocotom.dm.bootstrap;
+package com.nocotom.dm.configuration;
 
 import org.influxdb.dto.Point;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,7 +12,7 @@ import org.springframework.data.influxdb.converter.PointConverter;
 
 @Configuration
 @EnableConfigurationProperties(InfluxDBProperties.class)
-public class InfluxDbBootstrapper
+public class InfluxDbConfiguration
 {
     @Bean
     public InfluxDBConnectionFactory connectionFactory(final InfluxDBProperties properties)

@@ -1,22 +1,16 @@
-package com.nocotom.dm.bootstrap;
+package com.nocotom.dm.configuration;
 
-import com.nocotom.dm.configuration.MqttBrokerProperties;
+import com.nocotom.dm.properties.MqttBrokerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.annotation.MessagingGateway;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
-import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHandler;
 
 @Configuration
-public class MqttBootstrapper {
+public class MqttConfiguration {
     private final MqttBrokerProperties brokerProperties;
 
-    public MqttBootstrapper(MqttBrokerProperties brokerProperties) {
+    public MqttConfiguration(MqttBrokerProperties brokerProperties) {
         this.brokerProperties = brokerProperties;
     }
 

@@ -5,20 +5,18 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @EqualsAndHashCode
 @ToString
-public class FilterItem {
+public class Point {
 
     @NotNull
-    @Size(min=1, max=30)
-    private String key;
+    private BigDecimal value;
 
     @NotNull
-    @Size(min=1, max=30)
-    private Object value;
-
-    private boolean exact = true;
+    private Instant timestamp;
 }

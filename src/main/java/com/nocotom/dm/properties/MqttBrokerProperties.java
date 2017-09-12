@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("mqtt-broker")
 public class MqttBrokerProperties {
 
-    private static final String DEFAULT_MQTT_URI = "tcp://localhost:1883";
+    public static final String DEFAULT_MQTT_URI = "tcp://localhost:1883";
 
     public final static String COMMAND_TOPIC_PATTERN = "devices/{0}/command";
 

@@ -6,22 +6,24 @@ import org.influxdb.dto.Point;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.influxdb.InfluxDBTemplate;
-import org.springframework.integration.annotation.Gateway;
-import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.core.MessageProducer;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.json.JsonToObjectTransformer;
+import org.springframework.integration.json.ObjectToJsonTransformer;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.stereotype.Controller;
+import org.springframework.integration.stomp.StompSessionManager;
+import org.springframework.integration.stomp.outbound.StompMessageHandler;
+import org.springframework.integration.transformer.Transformer;
+import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.support.GenericMessage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 @Configuration
 public class MeasurementFlowConfiguration {
 
@@ -35,6 +37,17 @@ public class MeasurementFlowConfiguration {
 
     public MeasurementFlowConfiguration(InfluxDBTemplate<Point> influxDBTemplate) {
         this.influxDBTemplate = influxDBTemplate;
+    }
+
+    @Bean
+    public IntegrationFlow measurementFlow() {
+        return IntegrationFlows.from(MEASUREMENT_INBOUND_CHANNEL_NAME)
+                .transform(new JsonToObjectTransformer(DeviceMeasurementEvent.class))
+                .channel(MEASUREMENT_PERSISTENCE_CHANNEL_NAME)
+                .transform(new ObjectToJsonTransformer())
+                .transform((Transformer) message -> new GenericMessage<Object>(((String)message.getPayload()).getBytes(StandardCharsets.UTF_8)))
+                .channel(MEASUREMENT_OUTBOUND_CHANNEL_NAME)
+                .get();
     }
 
     @Bean
@@ -52,14 +65,14 @@ public class MeasurementFlowConfiguration {
     }
 
     @Bean
-    public IntegrationFlow measurementFlow() {
-        return IntegrationFlows.from(MEASUREMENT_INBOUND_CHANNEL_NAME)
-                .transform(new JsonToObjectTransformer(DeviceMeasurementEvent.class))
-                .channel(MEASUREMENT_PERSISTENCE_CHANNEL_NAME)
-                .gateway(MEASUREMENT_OUTBOUND_CHANNEL_NAME)
-                .get();
+    @ServiceActivator(inputChannel = MEASUREMENT_OUTBOUND_CHANNEL_NAME)
+    public MessageHandler stompMessageHandler(StompSessionManager stompSessionManager) {
+        StompMessageHandler stompMessageHandler = new StompMessageHandler(stompSessionManager);
+        stompMessageHandler.setDestination("/devices/devId/register");
+        stompMessageHandler.setConnectTimeout(10000);
+        return stompMessageHandler;
     }
-    
+
     @ServiceActivator(inputChannel = MEASUREMENT_PERSISTENCE_CHANNEL_NAME)
     public void persistMeasurement(DeviceMeasurementEvent measurementEvent) {
         List<Point> points = measurementEvent.getPoints()
@@ -71,15 +84,5 @@ public class MeasurementFlowConfiguration {
                         .build())
                 .collect(Collectors.toList());
         //influxDBTemplate.write(points);
-    }
-
-    @MessagingGateway
-    @Controller
-    public interface MeasurementGateway {
-
-        @MessageMapping("/devices/measurement")
-        @Gateway(requestChannel = MEASUREMENT_OUTBOUND_CHANNEL_NAME)
-        String gateway(DeviceMeasurementEvent measurementEvent);
-
     }
 }

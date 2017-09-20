@@ -8,12 +8,8 @@ import javax.validation.constraints.Size;
 import java.util.Map;
 
 @Data
-@EqualsAndHashCode
-public class DeviceRegisterEvent {
-
-    @NotNull
-    @Size(min=2, max=30)
-    private String deviceId;
+@EqualsAndHashCode(callSuper = true)
+public class DeviceRegisterEvent extends DeviceEvent {
 
     @NotNull
     private Map<String, Object> properties;

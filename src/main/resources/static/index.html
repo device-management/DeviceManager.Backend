@@ -37,7 +37,10 @@
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function(frame) {
             addMessage('Connected: ' + frame);
-            stompClient.subscribe('/devices/{.+}/register', function(messageOutput) {
+            stompClient.subscribe('/devices/{.+}/measurement', function(messageOutput) {
+                addMessage(messageOutput.body);
+            });
+            stompClient.subscribe('/devices/dev1/measurement', function(messageOutput) {
                 addMessage(messageOutput.body);
             });
         });

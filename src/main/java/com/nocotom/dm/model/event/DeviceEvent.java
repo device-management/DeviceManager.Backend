@@ -5,12 +5,12 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Map;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class DeviceCommandEvent extends DeviceEvent {
+@EqualsAndHashCode
+public abstract class DeviceEvent {
 
     @NotNull
-    private Map<String, Object> properties;
+    @Size(min=2, max=30)
+    private String deviceId;
 }

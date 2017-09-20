@@ -9,12 +9,8 @@ import javax.validation.constraints.Size;
 import java.util.Collection;
 
 @Data
-@EqualsAndHashCode
-public class DeviceMeasurementEvent {
-
-    @NotNull
-    @Size(min=2, max=30)
-    private String deviceId;
+@EqualsAndHashCode(callSuper = true)
+public class DeviceMeasurementEvent extends DeviceEvent {
 
     @NotNull
     private Collection<Point> points;

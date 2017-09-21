@@ -15,20 +15,17 @@ import org.springframework.data.influxdb.converter.PointConverter;
 public class InfluxDbConfiguration
 {
     @Bean
-    public InfluxDBConnectionFactory connectionFactory(final InfluxDBProperties properties)
-    {
+    public InfluxDBConnectionFactory connectionFactory(final InfluxDBProperties properties) {
         return new InfluxDBConnectionFactory(properties);
     }
 
     @Bean
-    public InfluxDBTemplate<Point> influxDBTemplate(final InfluxDBConnectionFactory connectionFactory)
-    {
+    public InfluxDBTemplate<Point> influxDBTemplate(final InfluxDBConnectionFactory connectionFactory) {
         return new InfluxDBTemplate<>(connectionFactory, new PointConverter());
     }
 
     @Bean
-    public DefaultInfluxDBTemplate defaultTemplate(final InfluxDBConnectionFactory connectionFactory)
-    {
+    public DefaultInfluxDBTemplate defaultTemplate(final InfluxDBConnectionFactory connectionFactory) {
         return new DefaultInfluxDBTemplate(connectionFactory);
     }
 }

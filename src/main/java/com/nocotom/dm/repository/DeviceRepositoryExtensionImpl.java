@@ -4,16 +4,22 @@ import com.nocotom.dm.model.Device;
 import com.nocotom.dm.model.Filter;
 import com.nocotom.dm.model.FilterItem;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-public class FilterableDeviceRepositoryImpl implements FilterableDeviceRepository {
+import java.util.Map;
 
-    @Autowired
-    private ReactiveMongoTemplate mongoTemplate;
+public class DeviceRepositoryExtensionImpl implements DeviceRepositoryExtension {
+
+    private final ReactiveMongoTemplate mongoTemplate;
+
+    public DeviceRepositoryExtensionImpl(ReactiveMongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
     @Override
     public Flux<Device> filter(Filter filter) {
@@ -21,7 +27,7 @@ public class FilterableDeviceRepositoryImpl implements FilterableDeviceRepositor
         Criteria criteria = new Criteria();
 
         if(filter.getFilters().size() > 0){
-            Criteria [] filters = filter.getFilters().stream().map(FilterableDeviceRepositoryImpl::parseFilterItem).toArray(Criteria[]::new);
+            Criteria [] filters = filter.getFilters().stream().map(DeviceRepositoryExtensionImpl::parseFilterItem).toArray(Criteria[]::new);
             switch (filter.getLogic()) {
                 case ALL:
                     criteria.andOperator(filters);
@@ -44,6 +50,17 @@ public class FilterableDeviceRepositoryImpl implements FilterableDeviceRepositor
         }
 
         return mongoTemplate.find(query, Device.class);
+    }
+
+    @Override
+    public Mono updateState(String deviceId, Map<String, Object> state) {
+        Criteria criteria = Criteria.where("id").is(deviceId);
+        Query query = new Query(criteria);
+
+        Update update = new Update();
+        update.set("state", state);
+
+        return mongoTemplate.update(Device.class).matching(query).apply(update).first();
     }
 
     private static Criteria parseFilterItem(FilterItem filterItem) {

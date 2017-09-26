@@ -1,8 +1,6 @@
 package com.nocotom.dm.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
@@ -10,7 +8,8 @@ import javax.validation.constraints.Size;
 
 import java.util.Map;
 
-@Data
+@AllArgsConstructor
+@Getter
 @EqualsAndHashCode
 @ToString
 public class Device {
@@ -18,8 +17,19 @@ public class Device {
     @NotNull
     @Size(min=2, max=30)
     @Id
-    private String deviceId;
+    private String id;
 
     @NotNull
-    private Map<String, Object> properties;
+    @Size(min=2, max=30)
+    private String name;
+
+    @NotNull
+    @Size(min=2, max=30)
+    private String type;
+
+    @NotNull
+    private Map<String, Object> configuration;
+
+    @NotNull
+    private Map<String, Object> state;
 }

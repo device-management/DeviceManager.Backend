@@ -12,5 +12,17 @@ import java.util.Map;
 public class DeviceRegisterEvent extends DeviceEvent {
 
     @NotNull
-    private Map<String, Object> properties;
+    @Size(min=2, max=30)
+    private String name;
+
+    @NotNull
+    @Size(min=2, max=30)
+    private String type;
+
+    @NotNull
+    private Map<String, Object> configuration;
+
+    @NotNull
+    private Map<String, Object> state;
+
 }

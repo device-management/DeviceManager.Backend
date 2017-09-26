@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DeviceRepository extends FilterableDeviceRepository, ReactiveMongoRepository<Device, String> {
+public interface DeviceRepository extends DeviceRepositoryExtension, ReactiveMongoRepository<Device, String> {
 }

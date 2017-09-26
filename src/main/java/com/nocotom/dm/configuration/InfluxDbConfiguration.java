@@ -21,7 +21,9 @@ public class InfluxDbConfiguration
 
     @Bean
     public InfluxDBTemplate<Point> influxDBTemplate(final InfluxDBConnectionFactory connectionFactory) {
-        return new InfluxDBTemplate<>(connectionFactory, new PointConverter());
+        InfluxDBTemplate<Point> template = new InfluxDBTemplate<>(connectionFactory, new PointConverter());
+        template.createDatabase();
+        return template;
     }
 
     @Bean

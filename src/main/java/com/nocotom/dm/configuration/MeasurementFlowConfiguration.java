@@ -1,7 +1,6 @@
 package com.nocotom.dm.configuration;
 
 import com.nocotom.dm.model.event.DeviceMeasurementEvent;
-import com.nocotom.dm.utility.Classes;
 import com.nocotom.dm.utility.StringToByteArrayTransformer;
 import org.influxdb.dto.Point;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +17,6 @@ import org.springframework.integration.stomp.StompSessionManager;
 import org.springframework.integration.stomp.outbound.StompMessageHandler;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessagingException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -29,13 +27,15 @@ import java.util.stream.Collectors;
 @Configuration
 public class MeasurementFlowConfiguration {
 
+    private static final String MEASUREMENT_FLOW_NAME = "MeasurementFlow";
+
     private static final String PERSISTENCE_HANDLER_NAME = "MeasurementPersistenceHandler";
 
     private static final String BROADCAST_HANDLER_NAME = "MeasurementBroadcastHandler";
 
-    @Bean
+    @Bean(name = MEASUREMENT_FLOW_NAME)
     public IntegrationFlow measurementFlow(
-            @Qualifier(PERSISTENCE_HANDLER_NAME) GenericHandler<Object> persistenceHandler,
+            @Qualifier(PERSISTENCE_HANDLER_NAME) GenericHandler<DeviceMeasurementEvent> persistenceHandler,
             @Qualifier(BROADCAST_HANDLER_NAME) MessageHandler broadcastHandler) {
 
         return IntegrationFlows.from(Channels.MEASUREMENT_INBOUND_CHANNEL_NAME)
@@ -61,16 +61,13 @@ public class MeasurementFlowConfiguration {
     }
 
     @Bean(name = PERSISTENCE_HANDLER_NAME)
-    public GenericHandler<Object> persistMeasurement(InfluxDBTemplate<Point> influxDBTemplate) {
+    public GenericHandler<DeviceMeasurementEvent> persistMeasurement(InfluxDBTemplate<Point> influxDBTemplate) {
         return (payload, headers) -> {
-            DeviceMeasurementEvent measurementEvent =
-                    Classes.tryCast(payload, DeviceMeasurementEvent.class)
-                            .orElseThrow(() -> new MessagingException("The payload is not a DeviceMeasurementEvent instance."));
 
-            List<Point> points = measurementEvent.getPoints()
+            List<Point> points = payload.getPoints()
                     .stream()
                     .map(point -> Point
-                            .measurement(measurementEvent.getDeviceId())
+                            .measurement(payload.getDeviceId())
                             .time(point.getTimestamp().toEpochMilli(), TimeUnit.MILLISECONDS)
                             .addField("measurement", point.getValue())
                             .build())

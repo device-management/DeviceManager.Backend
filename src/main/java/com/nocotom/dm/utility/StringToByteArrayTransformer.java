@@ -17,15 +17,15 @@ public class StringToByteArrayTransformer implements Transformer {
         this.charset = charset;
     }
 
-    public StringToByteArrayTransformer(){
+    public StringToByteArrayTransformer() {
         this(Charset.defaultCharset());
     }
 
     @Override
     public Message<?> transform(Message<?> message) {
-        if(message.getPayload() instanceof String){
+        if (message.getPayload() instanceof String) {
             return MessageBuilder.withPayload(((String) message.getPayload()).getBytes(charset)).copyHeaders(message.getHeaders()).build();
-        }else{
+        } else {
             throw new MessageTransformationException(message, "The payload is not a String instance.");
         }
     }

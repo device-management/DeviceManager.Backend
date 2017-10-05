@@ -33,9 +33,9 @@ public class StompClientConfiguration {
     }
 
     @Bean
-    public StompSessionManager stompSessionManager() {
+    public StompSessionManager stompSessionManager(StompBrokerProperties properties) {
         WebSocketStompSessionManager webSocketStompSessionManager =
-                new WebSocketStompSessionManager(stompClient(), "http://localhost:8080/channels");
+                new WebSocketStompSessionManager(stompClient(), properties.getUri());
         webSocketStompSessionManager.setAutoReceipt(true);
         webSocketStompSessionManager.setRecoveryInterval(1000);
         return webSocketStompSessionManager;

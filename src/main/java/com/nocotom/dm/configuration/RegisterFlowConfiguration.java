@@ -3,7 +3,6 @@ package com.nocotom.dm.configuration;
 import com.nocotom.dm.model.Device;
 import com.nocotom.dm.model.event.DeviceRegisterEvent;
 import com.nocotom.dm.repository.DeviceRepository;
-import com.nocotom.dm.utility.Classes;
 import com.nocotom.dm.utility.StringToByteArrayTransformer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +17,6 @@ import org.springframework.integration.stomp.StompSessionManager;
 import org.springframework.integration.stomp.outbound.StompMessageHandler;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessagingException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
@@ -26,13 +24,15 @@ import java.util.concurrent.Executors;
 @Configuration
 public class RegisterFlowConfiguration {
 
+    private static final String REGISTER_FLOW_NAME = "RegisterFlow";
+
     private static final String PERSISTENCE_HANDLER_NAME = "RegisterPersistenceHandler";
 
     private static final String BROADCAST_HANDLER_NAME = "RegisterBroadcastHandler";
 
-    @Bean
+    @Bean(name = REGISTER_FLOW_NAME)
     public IntegrationFlow registerFlow(
-            @Qualifier(PERSISTENCE_HANDLER_NAME) GenericHandler<Object> persistenceHandler,
+            @Qualifier(PERSISTENCE_HANDLER_NAME) GenericHandler<DeviceRegisterEvent> persistenceHandler,
             @Qualifier(BROADCAST_HANDLER_NAME) MessageHandler broadcastHandler) {
 
         return IntegrationFlows.from(Channels.REGISTER_INBOUND_CHANNEL_NAME)
@@ -58,18 +58,15 @@ public class RegisterFlowConfiguration {
     }
 
     @Bean(name = PERSISTENCE_HANDLER_NAME)
-    public GenericHandler<Object> persistRegister(DeviceRepository deviceRepository) {
+    public GenericHandler<DeviceRegisterEvent> persistRegister(DeviceRepository deviceRepository) {
         return (payload, headers) -> {
-            DeviceRegisterEvent registerEvent =
-                    Classes.tryCast(payload, DeviceRegisterEvent.class)
-                            .orElseThrow(() -> new MessagingException("The payload is not a DeviceRegisterEvent instance."));
 
             Device device = new Device(
-                    registerEvent.getDeviceId(),
-                    registerEvent.getName(),
-                    registerEvent.getType(),
-                    registerEvent.getConfiguration(),
-                    registerEvent.getState()
+                    payload.getDeviceId(),
+                    payload.getName(),
+                    payload.getType(),
+                    payload.getConfiguration(),
+                    payload.getState()
             );
             deviceRepository.save(device).block();
 

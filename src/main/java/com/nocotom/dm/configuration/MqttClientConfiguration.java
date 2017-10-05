@@ -1,6 +1,5 @@
 package com.nocotom.dm.configuration;
 
-import com.nocotom.dm.properties.MqttBrokerProperties;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,16 +17,16 @@ import org.springframework.messaging.handler.annotation.Header;
 public class MqttClientConfiguration {
 
     @Bean
-    public MqttPahoClientFactory mqttClientFactory(){
+    public MqttPahoClientFactory mqttClientFactory(MqttBrokerProperties properties){
         DefaultMqttPahoClientFactory mqttClientFactory = new DefaultMqttPahoClientFactory();
-        mqttClientFactory.setServerURIs(MqttBrokerProperties.DEFAULT_MQTT_URI);
+        mqttClientFactory.setServerURIs(properties.getUris());
         return mqttClientFactory;
     }
 
     @Bean
-    public MessageProducer deviceMessageInbound(MqttPahoClientFactory clientFactory) {
+    public MessageProducer deviceMessageInbound(MqttBrokerProperties properties, MqttPahoClientFactory clientFactory) {
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
-                MqttBrokerProperties.DEFAULT_USER_NAME,
+                properties.getUserName(),
                 clientFactory);
         adapter.addTopic(
                 MqttBrokerProperties.MEASUREMENT_TOPIC,

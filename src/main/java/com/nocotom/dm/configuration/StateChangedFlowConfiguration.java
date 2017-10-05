@@ -2,7 +2,6 @@ package com.nocotom.dm.configuration;
 
 import com.nocotom.dm.model.event.DeviceStateChangedEvent;
 import com.nocotom.dm.repository.DeviceRepository;
-import com.nocotom.dm.utility.Classes;
 import com.nocotom.dm.utility.StringToByteArrayTransformer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +16,6 @@ import org.springframework.integration.stomp.StompSessionManager;
 import org.springframework.integration.stomp.outbound.StompMessageHandler;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessagingException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
@@ -25,13 +23,15 @@ import java.util.concurrent.Executors;
 @Configuration
 public class StateChangedFlowConfiguration {
 
+    private static final String STATE_CHANGED_FLOW_NAME = "StateChangedFlow";
+
     private static final String PERSISTENCE_HANDLER_NAME = "StateChangedPersistenceHandler";
 
     private static final String BROADCAST_HANDLER_NAME = "StateChangedBroadcastHandler";
 
-    @Bean
+    @Bean(name = STATE_CHANGED_FLOW_NAME)
     public IntegrationFlow registerFlow(
-            @Qualifier(PERSISTENCE_HANDLER_NAME) GenericHandler<Object> persistenceHandler,
+            @Qualifier(PERSISTENCE_HANDLER_NAME) GenericHandler<DeviceStateChangedEvent> persistenceHandler,
             @Qualifier(BROADCAST_HANDLER_NAME) MessageHandler broadcastHandler) {
 
         return IntegrationFlows.from(Channels.STATE_CHANGED_INBOUND_CHANNEL_NAME)
@@ -57,13 +57,10 @@ public class StateChangedFlowConfiguration {
     }
 
     @Bean(name = PERSISTENCE_HANDLER_NAME)
-    public GenericHandler<Object> persistStateChanged(DeviceRepository deviceRepository) {
+    public GenericHandler<DeviceStateChangedEvent> persistStateChanged(DeviceRepository deviceRepository) {
         return (payload, headers) -> {
-            DeviceStateChangedEvent stateChangedEvent =
-                    Classes.tryCast(payload, DeviceStateChangedEvent.class)
-                            .orElseThrow(() -> new MessagingException("The payload is not a DeviceStateChangedEvent instance."));
 
-            deviceRepository.updateState(stateChangedEvent.getDeviceId(), stateChangedEvent.getState()).block();
+            deviceRepository.updateState(payload.getDeviceId(), payload.getState()).block();
 
             return payload;
         };

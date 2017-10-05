@@ -1,4 +1,4 @@
-package com.nocotom.dm.properties;
+package com.nocotom.dm.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,10 +8,8 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties("mqtt-broker")
+@ConfigurationProperties("spring.mqtt")
 public class MqttBrokerProperties {
-
-    public static final String DEFAULT_MQTT_URI = "tcp://localhost:1883";
 
     public final static String COMMAND_TOPIC_PATTERN = "devices/{0}/command";
 
@@ -21,11 +19,11 @@ public class MqttBrokerProperties {
 
     public final static String STATE_TOPIC = "devices/+/state";
 
-    public final static String DEFAULT_USER_NAME = "dm-backend";
+    private static final String DEFAULT_MQTT_URI = "tcp://localhost:1883";
 
-    private String uri =  DEFAULT_MQTT_URI;
+    private final static String DEFAULT_USER_NAME = "dm-backend";
 
-    private String[] subscribeTopics = new String[] { MEASUREMENT_TOPIC, REGISTER_TOPIC, STATE_TOPIC };
+    private String[] uris =  { DEFAULT_MQTT_URI };
 
     private String userName = DEFAULT_USER_NAME;
 }

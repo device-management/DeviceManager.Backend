@@ -31,13 +31,15 @@ public class StateChangedFlowConfiguration {
 
     @Bean(name = STATE_CHANGED_FLOW_NAME)
     public IntegrationFlow registerFlow(
+            @Qualifier(Handlers.CONSTRAINTS_VALIDATOR) GenericHandler<Object> constraintValidator,
             @Qualifier(PERSISTENCE_HANDLER_NAME) GenericHandler<DeviceStateChangedEvent> persistenceHandler,
             @Qualifier(BROADCAST_HANDLER_NAME) MessageHandler broadcastHandler) {
 
         return IntegrationFlows.from(Channels.STATE_CHANGED_INBOUND_CHANNEL_NAME)
                 .channel(c -> c.executor(Executors.newCachedThreadPool()))
                 .transform(new JsonToObjectTransformer(DeviceStateChangedEvent.class))
-                .enrich(DeviceHeaders::addDeviceIdHeader)
+                .handle(constraintValidator)
+                .enrich(Headers::addDeviceIdHeader)
                 .handle(persistenceHandler)
                 .transform(new ObjectToJsonTransformer())
                 .transform(new StringToByteArrayTransformer(StandardCharsets.UTF_8))
@@ -50,7 +52,7 @@ public class StateChangedFlowConfiguration {
         StompMessageHandler stompMessageHandler = new StompMessageHandler(stompSessionManager);
         stompMessageHandler.setDestinationExpression(
                 new FunctionExpression<Message<?>>(
-                        message -> String.format("/devices/%s/state", message.getHeaders().get(DeviceHeaders.DEVICE_ID)))
+                        message -> String.format("/devices/%s/state", message.getHeaders().get(Headers.DEVICE_ID)))
         );
         stompMessageHandler.setConnectTimeout(10000);
         return stompMessageHandler;

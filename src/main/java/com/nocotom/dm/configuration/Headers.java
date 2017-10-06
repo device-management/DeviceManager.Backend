@@ -3,9 +3,9 @@ package com.nocotom.dm.configuration;
 import com.nocotom.dm.model.event.DeviceEvent;
 import org.springframework.integration.dsl.EnricherSpec;
 
-class DeviceHeaders {
+class Headers {
 
-    private DeviceHeaders(){
+    private Headers(){
     }
 
     static final String DEVICE_ID = "DeviceId";

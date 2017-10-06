@@ -18,6 +18,7 @@ import org.springframework.integration.stomp.outbound.StompMessageHandler;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 
+import javax.validation.Validation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -35,13 +36,15 @@ public class MeasurementFlowConfiguration {
 
     @Bean(name = MEASUREMENT_FLOW_NAME)
     public IntegrationFlow measurementFlow(
+            @Qualifier(Handlers.CONSTRAINTS_VALIDATOR) GenericHandler<Object> constraintValidator,
             @Qualifier(PERSISTENCE_HANDLER_NAME) GenericHandler<DeviceMeasurementEvent> persistenceHandler,
             @Qualifier(BROADCAST_HANDLER_NAME) MessageHandler broadcastHandler) {
 
         return IntegrationFlows.from(Channels.MEASUREMENT_INBOUND_CHANNEL_NAME)
                 .channel(c -> c.executor(Executors.newCachedThreadPool()))
                 .transform(new JsonToObjectTransformer(DeviceMeasurementEvent.class))
-                .enrich(DeviceHeaders::addDeviceIdHeader)
+                .handle(constraintValidator)
+                .enrich(Headers::addDeviceIdHeader)
                 .handle(persistenceHandler)
                 .transform(new ObjectToJsonTransformer())
                 .transform(new StringToByteArrayTransformer(StandardCharsets.UTF_8))
@@ -54,7 +57,7 @@ public class MeasurementFlowConfiguration {
         StompMessageHandler stompMessageHandler = new StompMessageHandler(stompSessionManager);
         stompMessageHandler.setDestinationExpression(
                 new FunctionExpression<Message<?>>(
-                        message -> String.format("/devices/%s/measurement", message.getHeaders().get(DeviceHeaders.DEVICE_ID)))
+                        message -> String.format("/devices/%s/measurement", message.getHeaders().get(Headers.DEVICE_ID)))
         );
         stompMessageHandler.setConnectTimeout(10000);
         return stompMessageHandler;

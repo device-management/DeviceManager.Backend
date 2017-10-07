@@ -36,24 +36,24 @@ public class MqttClientConfiguration {
 
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
-        adapter.setOutputChannelName(Channels.DEVICE_INBOUND_CHANNEL_NAME);
+        adapter.setOutputChannelName(Channels.DEVICE_CHANNEL);
         return adapter;
     }
 
     @MessageEndpoint
     public class MqttMessageRouter {
 
-        @Router(inputChannel = Channels.DEVICE_INBOUND_CHANNEL_NAME)
+        @Router(inputChannel = Channels.DEVICE_CHANNEL)
         public String route(@Header(MqttHeaders.RECEIVED_TOPIC) String topic){
 
             if(MqttTopic.isMatched(MqttBrokerProperties.MEASUREMENT_TOPIC, topic)){
-                return Channels.MEASUREMENT_INBOUND_CHANNEL_NAME;
+                return Channels.MEASUREMENT_CHANNEL;
             }
             if(MqttTopic.isMatched(MqttBrokerProperties.REGISTER_TOPIC, topic)){
-                return Channels.REGISTER_INBOUND_CHANNEL_NAME;
+                return Channels.REGISTER_CHANNEL;
             }
             if(MqttTopic.isMatched(MqttBrokerProperties.STATE_TOPIC, topic)){
-                return Channels.STATE_CHANGED_INBOUND_CHANNEL_NAME;
+                return Channels.STATE_CHANGED_CHANNEL;
             }
             return null;
         }

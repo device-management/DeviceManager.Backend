@@ -2,8 +2,12 @@ package com.nocotom.dm.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.expression.FunctionExpression;
 import org.springframework.integration.stomp.StompSessionManager;
 import org.springframework.integration.stomp.WebSocketStompSessionManager;
+import org.springframework.integration.stomp.outbound.StompMessageHandler;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHandler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -39,5 +43,16 @@ public class StompClientConfiguration {
         webSocketStompSessionManager.setAutoReceipt(true);
         webSocketStompSessionManager.setRecoveryInterval(1000);
         return webSocketStompSessionManager;
+    }
+
+    @Bean(name = Handlers.BROADCAST_DEVICE_EVENT)
+    public MessageHandler broadcastDeviceEvent(StompSessionManager stompSessionManager) {
+        StompMessageHandler stompMessageHandler = new StompMessageHandler(stompSessionManager);
+        stompMessageHandler.setDestinationExpression(
+                new FunctionExpression<Message<?>>(
+                        message -> String.format("/devices/%s", message.getHeaders().get(Headers.DEVICE_ID)))
+        );
+        stompMessageHandler.setConnectTimeout(10000);
+        return stompMessageHandler;
     }
 }
